@@ -8,11 +8,9 @@ const PORT = process.env.PORT || 3030;
 const app = express();
 
 app.use(logger("dev"));
-
 app.use(compression());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
 app.use(express.static("public"));
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/budget", {
@@ -21,6 +19,10 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/budget", {
   useCreateIndex: true,
   useFindAndModify: false,
 });
+
+const mongodb = mongoose.connection;
+mongodb.on("error", console.error.bind(console, "connection error:"));
+mongodb.once("open", () => console.log("Connected to database."));
 
 // routes
 app.use(require("./routes/api.js"));
